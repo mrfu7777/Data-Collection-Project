@@ -3,28 +3,29 @@ import json
 from dotenv import load_dotenv
 from googleapiclient.discovery import build
 
-# 获取当前脚本所在的绝对路径
+# Get the absolute path of the current script
 basedir = os.path.abspath(os.path.dirname(__file__))
-# 拼接出 .env 的完整路径
+# Construct the full path to the .env file
 dotenv_path = os.path.join(basedir, '.env')
 
-# 加载该路径下的 .env
+# Load the .env file
 load_dotenv(dotenv_path)
 
 api_key = os.getenv('YOUTUBE_API_KEY')
 
-# 调试：确认是否读到
+# Debugging: Confirm if the key is loaded
 if not api_key:
-    print(f"错误：未在 {dotenv_path} 中找到 YOUTUBE_API_KEY")
+    print(f"Error: YOUTUBE_API_KEY not found in {dotenv_path}")
 else:
-    print("API Key 已成功加载")
+    print("API Key loaded successfully.")
+
 youtube = build('youtube', 'v3', developerKey=api_key)
 
 query = 'Artificial Intelligence'
 all_videos = []
 next_page_token = None
 
-# 分页循环获取数据
+# Paginated loop to collect data
 while len(all_videos) < 100:
     request = youtube.search().list(
         q=query,
@@ -51,8 +52,8 @@ while len(all_videos) < 100:
     if not next_page_token:
         break
 
-# 保存数据
+# Save the raw data to a JSON file
 with open('youtube_data.json', 'w', encoding='utf-8') as f:
     json.dump(all_videos, f, indent=4, ensure_ascii=False)
 
-print(f"成功收集了 {len(all_videos)} 条记录，已保存至 youtube_data.json")
+print(f"Successfully collected {len(all_videos)} records. Saved to youtube_data.json.")
